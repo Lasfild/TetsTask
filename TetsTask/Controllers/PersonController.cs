@@ -19,19 +19,16 @@ namespace TetsTask.Controllers
         {
             _context = context;
         }
-
-        // Метод для отображения списка людей (index.cshtml)
         public async Task<IActionResult> Index()
         {
             var persons = await _context.Person.ToListAsync();
             if (persons == null)
             {
-                persons = new List<Person>(); // Убедитесь, что модель не равна null
+                persons = new List<Person>();
             }
             return View(persons);
         }
 
-        // Метод для загрузки CSV файла
         [HttpPost]
         public async Task<IActionResult> UploadCsv(IFormFile file)
         {
@@ -56,7 +53,6 @@ namespace TetsTask.Controllers
                 {
                     var records = csv.GetRecords<Person>().ToList();
 
-                    // Убедитесь, что в CSV файле есть данные
                     if (!records.Any())
                     {
                         return BadRequest("No valid records found in the CSV file.");
@@ -68,7 +64,6 @@ namespace TetsTask.Controllers
             }
             catch (Exception ex)
             {
-                // Логирование ошибки
                 Console.WriteLine($"Error: {ex.Message}");
                 return StatusCode(StatusCodes.Status500InternalServerError, "Internal server error");
             }
@@ -76,7 +71,7 @@ namespace TetsTask.Controllers
             return RedirectToAction("Index", "Home");
         }
 
-        // GET: /Person/Edit/{id} - Открываем страницу редактирования
+        // GET: /Person/Edit/{id}
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
@@ -89,7 +84,7 @@ namespace TetsTask.Controllers
             return View(person);
         }
 
-        // POST: /Person/Edit/{id} - Обрабатываем изменения
+        // POST: /Person/Edit/{id}
         [HttpPost]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Name,DateOfBirth,IsMarried,Phone,Salary")] Person person)
         {
@@ -115,7 +110,7 @@ namespace TetsTask.Controllers
             return RedirectToAction("Index", "Home");
         }
 
-        // GET: /Person/Delete/{id} - Открываем страницу удаления
+        // GET: /Person/Delete/{id}
         [HttpGet]
         public async Task<IActionResult> Delete(int id)
         {
@@ -128,7 +123,7 @@ namespace TetsTask.Controllers
             return View(person);
         }
 
-        // POST: /Person/Delete/{id} - Обрабатываем удаление
+        // POST: /Person/Delete/{id}
         [HttpPost]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
@@ -141,7 +136,6 @@ namespace TetsTask.Controllers
             _context.Person.Remove(person);
             await _context.SaveChangesAsync();
 
-            // Переадресация на Home/Index после удаления
             return RedirectToAction("Index", "Home");
         }
     }
