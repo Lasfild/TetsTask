@@ -2,9 +2,12 @@
 using Microsoft.EntityFrameworkCore;
 using TetsTask.DataAccess;
 using TetsTask.Models;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Globalization;
+using System.Threading.Tasks;
+using System.Collections.Generic;
+using System.IO;
+using CsvHelper;
+using CsvHelper.Configuration;
 
 namespace TetsTask.Controllers
 {
@@ -45,7 +48,7 @@ namespace TetsTask.Controllers
             try
             {
                 using (var reader = new StreamReader(file.OpenReadStream()))
-                using (var csv = new CsvHelper.CsvReader(reader, new CsvHelper.Configuration.CsvConfiguration(CultureInfo.InvariantCulture)
+                using (var csv = new CsvReader(reader, new CsvConfiguration(CultureInfo.InvariantCulture)
                 {
                     HeaderValidated = null,
                     MissingFieldFound = null
@@ -53,11 +56,7 @@ namespace TetsTask.Controllers
                 {
                     var records = csv.GetRecords<Person>().ToList();
 
-                    foreach (var record in records)
-                    {
-                        record.Id = 0; // Устанавливаем Id в 0 для автогенерации в базе данных
-                    }
-
+                    // Убедитесь, что в CSV файле есть данные
                     if (!records.Any())
                     {
                         return BadRequest("No valid records found in the CSV file.");
@@ -67,9 +66,10 @@ namespace TetsTask.Controllers
                     await _context.SaveChangesAsync();
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                // Исключение не обрабатывается
+                // Логирование ошибки
+                Console.WriteLine($"Error: {ex.Message}");
                 return StatusCode(StatusCodes.Status500InternalServerError, "Internal server error");
             }
 
