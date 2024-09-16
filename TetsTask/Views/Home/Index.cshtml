@@ -1,0 +1,50 @@
+﻿@model IEnumerable<TetsTask.Models.Person>
+
+@{
+    ViewData["Title"] = "Persons List";
+}
+
+<h2>People List</h2>
+
+<form asp-controller="Person" asp-action="UploadCsv" method="post" enctype="multipart/form-data">
+    <div class="form-group">
+        <label for="csvFile">Upload CSV File</label>
+        <input type="file" name="file" id="csvFile" class="form-control" />
+    </div>
+    <button type="submit" class="btn btn-primary">Upload</button>
+</form>
+
+<table id="personsTable" class="table">
+    <thead>
+        <tr>
+            <th style="cursor: pointer;" onclick="sortTable(0)">Name</th>
+            <th style="cursor: pointer;" onclick="sortTable(1)">Date of Birth</th>
+            <th style="cursor: pointer;" onclick="sortTable(2)">Married</th>
+            <th style="cursor: pointer;" onclick="sortTable(3)">Phone</th>
+            <th style="cursor: pointer;" onclick="sortTable(4)">Salary</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var person in Model)
+        {
+            <tr>
+                <td>@person.Name</td>
+                <td>@person.DateOfBirth.ToString("yyyy-MM-dd")</td>
+                <td>@(person.IsMarried ? "Yes" : "No")</td>
+                <td>@person.Phone</td>
+                <td>@person.Salary</td>
+                <td>
+                    <!-- Ссылка на страницу редактирования -->
+                    <a asp-controller="Person" asp-action="Edit" asp-route-id="@person.Id" class="btn btn-primary">Edit</a>
+
+                    <!-- Ссылка на страницу удаления -->
+                    <a asp-controller="Person" asp-action="Delete" asp-route-id="@person.Id" class="btn btn-danger">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<!-- Подключаем внешний JavaScript файл -->
+<script src="~/js/SortScript.js"></script>
